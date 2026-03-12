@@ -2,14 +2,16 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 require('dotenv').config();
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
 // POST /api/payments/create-order
 const createPaymentOrder = async (req, res) => {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        return res.status(503).json({ error: 'Online payments are not configured. Please use Cash on Delivery.' });
+    }
     try {
+        const razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+        });
         const { amount } = req.body; // amount in paise (e.g. ₹500 = 50000)
         const order = await razorpay.orders.create({
             amount,
