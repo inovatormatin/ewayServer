@@ -1,5 +1,6 @@
 const express = require("express");
 const fetchuser = require("../middleware/fetchuser");
+const requireAdmin = require("../middleware/requireAdmin");
 const { body } = require("express-validator");
 router = express.Router();
 const { getallblogs, getblogbyid, addblog, updateblog, deleteblog } = require("../controllers/blogRoutes");
@@ -14,10 +15,11 @@ router.get(
     getblogbyid
 );
 
-// Create new blog (login required)
+// Create new blog (admin required)
 router.post(
     "/addblog",
     fetchuser,
+    requireAdmin,
     body("title", "Title is required").exists(),
     body("description", "Description should be more then 20 letter").isLength({
         min: 20,
@@ -31,6 +33,7 @@ router.post(
 router.put(
     '/updateblog/:id',
     fetchuser,
+    requireAdmin,
     updateblog
 )
 
@@ -38,6 +41,7 @@ router.put(
 router.delete(
     '/deleteblog/:id',
     fetchuser,
+    requireAdmin,
     deleteblog
 )
 

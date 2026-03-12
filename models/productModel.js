@@ -3,6 +3,17 @@ const mongoose = require('mongoose');
 // declaring schecma
 const ProductSchema = mongoose.Schema(
     {
+        reviews: [
+            {
+                userId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+                userName:  { type: String, required: true },
+                rating:    { type: Number, required: true, min: 1, max: 5 },
+                comment:   { type: String, required: true },
+                createdAt: { type: Date, default: Date.now },
+            }
+        ],
+        averageRating: { type: Number, default: 0 },
+        totalReviews:  { type: Number, default: 0 },
         name: {
             type: String,
             required: [true, "Name is required"]

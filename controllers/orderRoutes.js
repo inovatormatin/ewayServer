@@ -24,12 +24,16 @@ const createOrder = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const { items, paymentMethod, userInfo, userId } = req.body;
+    const { items, paymentMethod, userInfo, userId, paymentId } = req.body;
+    if (userId !== req.user.id.toString()) {
+      return res.status(403).json({ error: 'User ID mismatch' });
+    }
     const orderproduct = new Orderproduct({
-      items, 
-      paymentMethod, 
+      items,
+      paymentMethod,
       userInfo,
       userId,
+      ...(paymentId && { paymentId, paymentStatus: 'Paid' }),
     });
     const newOrderproduct = await orderproduct.save();
     res.status(200).json({newOrderproduct, msg : "Order placed."});
@@ -60,8 +64,38 @@ const deleteOrder = async (req, res) => {
 }
 }
 
+// Route 4: Update order status (admin only)
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Orderproduct.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: true }
+    );
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Route 5: Get all orders (admin only)
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Orderproduct.find().sort({ orderPlaced: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 module.exports = {
   createOrder,
   getorderproduct,
-  deleteOrder
+  deleteOrder,
+  updateOrderStatus,
+  getAllOrders
 };

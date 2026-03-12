@@ -32,6 +32,19 @@ const OrderSchema = mongoose.Schema(
             type: String,
             required: [true, "User ID is required"]
         },
+        status: {
+            type: String,
+            enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
+            default: 'Pending',
+        },
+        paymentId: {
+            type: String,
+        },
+        paymentStatus: {
+            type: String,
+            enum: ['Unpaid', 'Paid'],
+            default: 'Unpaid',
+        },
         orderPlaced: {
             type: Date,
             default: Date.now

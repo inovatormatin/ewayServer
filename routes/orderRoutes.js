@@ -4,8 +4,11 @@ const fetchuser = require("../middleware/fetchuser");
 const {
   createOrder,
   getorderproduct,
-  deleteOrder
+  deleteOrder,
+  updateOrderStatus,
+  getAllOrders
 } = require("../controllers/orderRoutes");
+const requireAdmin = require("../middleware/requireAdmin");
 const { body } = require("express-validator");
 
 // get orders by user Id
@@ -31,5 +34,11 @@ router.delete(
   fetchuser,
   deleteOrder
 )
+
+// update order status (admin only)
+router.patch('/updatestatus/:id', fetchuser, requireAdmin, updateOrderStatus);
+
+// get all orders (admin only)
+router.get('/all', fetchuser, requireAdmin, getAllOrders);
 
 module.exports = router;

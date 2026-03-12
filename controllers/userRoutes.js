@@ -30,11 +30,11 @@ const login = async (req, res) => {
     }
     const data = {
       user: {
-        id: person.id,
+        id: person._id,
       },
     };
     // sending authtoken
-    const authtokken = jwt.sign(data, process.env.JWT_SECRET);
+    const authtokken = jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       success: true,
       authtokken: authtokken,
@@ -82,10 +82,10 @@ const signup = async (req, res) => {
     //   creating authtokken
     const data = {
       user: {
-        user: user.id,
+        id: newuser._id,
       },
     };
-    const authtokken = jwt.sign(data, process.env.JWT_SECRET);
+    const authtokken = jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       success: true,
       authtokken: authtokken,

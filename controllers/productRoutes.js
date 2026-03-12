@@ -2,11 +2,25 @@ const Product = require("../models/productModel");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
 
-// Route 1: Get All products
+// Route 1: Get All products (paginated for lazy loading)
 const getallproducts = async (req, res) => {
     try {
-        const product = await Product.find();
-        res.status(200).json(product)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const [products, total] = await Promise.all([
+            Product.find().skip(skip).limit(limit),
+            Product.countDocuments()
+        ]);
+
+        res.status(200).json({
+            products,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalProducts: total,
+            hasMore: skip + products.length < total
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: "Internal server error" })
